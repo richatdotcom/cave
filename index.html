@@ -1,21 +1,3 @@
-<!--
-  Project: Photo gallery site for GitHub (single-page static)
-  - Put this file as index.html in your repository root (or in /docs for GitHub Pages)
-  - Put your gallery photos in /images named photo1.jpg ... photo10.jpg (or change filenames in the JS below)
-  - Put two texture images in /assets: black-texture.jpg (menu background) and wood-texture.jpg (gallery background).
-    If you prefer CSS patterns instead, you can keep /assets empty and the CSS will fall back to subtle gradients.
-  - To publish: push repo to GitHub, then enable Pages (Settings → Pages) and point to the branch/folder where index.html is.
-
-  Features implemented:
-  - Menu page with black textured background, gold headline "SHE IS A REAL TREASURE" and grey subtitle
-  - Gallery page with dark wood background and a 10-photo carousel
-  - "Book page turn" transition effect between photos (3D Y-rotation with shading)
-  - Responsive layout, keyboard left/right navigation
-  - Small footer text bottom-right on menu: "Created in partnership with Y.W.T.G.T.H.F.T."
-
-  Notes: replace placeholder images in /images and textures in /assets. Filenames used here: images/photo1.jpg ... images/photo10.jpg
--->
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,283 +10,73 @@
       --menu-bg: url('./assets/black-texture.jpg');
       --gallery-bg: url('./assets/wood-texture.jpg');
       --soft-gray: #bdbdbd;
-      --max-width: 1100px;
-      --accent: #e6d7a4;
     }
 
-    /* Basic reset */
     *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#fff; background:#111}
+    body{font-family:Inter,system-ui,sans-serif;background:#000;color:#fff;}
 
-    /* Container */
-    .site{min-height:100vh;display:flex;align-items:center;justify-content:center}
-    .card{width:100%;max-width:var(--max-width);margin:40px;}
-
-    /* Menu page */
+    /* MENU */
     .menu{
-      min-height:70vh;
-      display:flex;align-items:center;justify-content:center;position:relative;padding:40px;border-radius:14px;overflow:hidden;
-      background-color:#000;
-      background-image: var(--menu-bg);
-      background-size:cover;background-position:center;
-      box-shadow: 0 10px 40px rgba(0,0,0,.6);
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background-image:var(--menu-bg);background-size:cover;background-position:center;
+      text-align:center;padding:20px;position:relative;
     }
-    /* subtle fallback textured effect if asset missing */
-    .menu[style*="url('')"]{background:linear-gradient(180deg,#0b0b0b 0%, #111 100%)}
+    .headline{font-size:48px;color:var(--gold);margin-bottom:20px;letter-spacing:2px;}
+    .subtitle{font-size:18px;color:var(--soft-gray);margin-bottom:30px;}
+    .btn{padding:10px 20px;border:none;border-radius:8px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;}
+    .menu-foot{position:absolute;right:20px;bottom:10px;color:#ccc;font-size:12px;}
 
-    .menu-inner{display:flex;flex-direction:column;gap:18px;align-items:flex-start;max-width:900px}
-    .headline{font-size:48px;letter-spacing:2px;color:var(--gold);font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.7)}
-    @media (max-width:560px){.headline{font-size:28px}}
-    .subtitle{color:var(--soft-gray);font-size:18px;max-width:60%}
-    @media (max-width:760px){.subtitle{max-width:100%}}
-
-    .menu-actions{margin-top:24px;display:flex;gap:12px}
-    .btn{padding:10px 18px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);cursor:pointer;color:#fff}
-    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,.12)}
-
-    .menu-foot{position:absolute;right:18px;bottom:12px;color:#cfcfcf;font-size:12px;opacity:.85}
-
-    /* Gallery page */
-    .gallery{min-height:70vh;border-radius:14px;overflow:hidden;position:relative;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#181414;background-image:var(--gallery-bg);background-size:cover;background-position:center}
-    .gallery[style*="url('')"]{background:linear-gradient(180deg,#111 0%,#1a1a1a 100%)}
-
-    .gallery-top{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-    .gallery-title{font-size:20px;color:var(--accent);font-weight:600}
-
-    /* viewer */
-    .viewer{width:100%;max-width:960px;height:560px;position:relative;perspective:1400px}
-    @media(max-width:860px){.viewer{height:420px}}
-    @media(max-width:560px){.viewer{height:300px}}
-
-    .page{position:absolute;inset:0;transform-style:preserve-3d;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-    .page img{width:100%;height:100%;object-fit:cover;backface-visibility:hidden}
-
-    /* front/back faces for page-turn */
-    .page .front, .page .back{position:absolute;inset:0;transform-origin:left center;transition:transform 900ms cubic-bezier(.2,.9,.2,1);}
-    .page .back{transform:rotateY(-180deg);}
-
-    /* active state */
-    .page.turning .front{transform:rotateY(-170deg)}
-    .page.turning .back{transform:rotateY(0deg)}
-
-    /* edge shadow to mimic paper */
-    .page::after{content:'';position:absolute;left:0;top:0;bottom:0;width:8%;pointer-events:none;background:linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,0));mix-blend-mode:multiply;opacity:0.9}
-
-    /* controls */
-    .controls{margin-top:18px;display:flex;gap:12px;align-items:center}
-    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18)}
-    .dot.active{background:var(--gold)}
-
-    .nav-btn{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06);padding:10px 14px;border-radius:8px;color:#fff;cursor:pointer}
-
-    /* small caption */
-    .caption{margin-top:10px;color:var(--soft-gray);font-size:14px}
-
-    /* utilities */
-    .hidden{display:none}
+    /* GALLERY */
+    .gallery{
+      min-height:100vh;padding:40px 20px;background-image:var(--gallery-bg);
+      background-size:cover;background-position:center;
+    }
+    .gallery-title{text-align:center;font-size:26px;color:var(--gold);margin-bottom:20px;}
+    .photo-list{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:30px;}
+    .photo-item{background:rgba(0,0,0,0.5);border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+    .photo-item img{width:100%;display:block;object-fit:cover;}
+    .back-btn{display:block;margin:30px auto 0;padding:10px 20px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#fff;cursor:pointer;}
   </style>
 </head>
 <body>
-  <div class="site">
-    <div class="card">
+  <section class="menu" id="menu">
+    <h1 class="headline">SHE IS A REAL TREASURE</h1>
+    <p class="subtitle">You can see the light, if you look right...</p>
+    <button id="openGallery" class="btn">Open Gallery</button>
+    <div class="menu-foot">Created in partnership with Y.W.T.G.T.H.F.T.</div>
+  </section>
 
-      <!-- MENU -->
-      <section id="menu" class="menu">
-        <div class="menu-inner">
-          <div class="headline">SHE IS A REAL TREASURE</div>
-          <div class="subtitle">You can see the light, if you look right...</div>
-          <div class="menu-actions">
-            <button id="openGallery" class="btn">Open Gallery</button>
-            <a href="#" class="btn secondary" id="viewAbout">About</a>
-          </div>
-        </div>
-        <div class="menu-foot">Created in partnership with Y.W.T.G.T.H.F.T.</div>
-      </section>
-
-      <!-- GALLERY -->
-      <section id="gallery" class="gallery hidden" aria-hidden="true">
-        <div class="gallery-top">
-          <div class="gallery-title">Gallery</div>
-          <div>
-            <button id="backToMenu" class="btn secondary">Back to Menu</button>
-          </div>
-        </div>
-
-        <div class="viewer" id="viewer" role="region" aria-label="Photo viewer">
-          <!-- pages will be injected here -->
-        </div>
-
-        <div class="controls">
-          <button id="prev" class="nav-btn">◀</button>
-          <div id="dots" style="display:flex;gap:8px;align-items:center"></div>
-          <button id="next" class="nav-btn">▶</button>
-        </div>
-        <div class="caption" id="caption">Photo 1 / 10</div>
-      </section>
-
-    </div>
-  </div>
+  <section class="gallery hidden" id="gallery">
+    <h2 class="gallery-title">Gallery</h2>
+    <div class="photo-list" id="photoList"></div>
+    <button id="backToMenu" class="back-btn">Back to Menu</button>
+  </section>
 
   <script>
-    (function(){
-      const TOTAL = 10; // number of photos
-      const viewer = document.getElementById('viewer');
-      const dots = document.getElementById('dots');
-      const caption = document.getElementById('caption');
-      const menu = document.getElementById('menu');
-      const gallery = document.getElementById('gallery');
-      let index = 0;
-      let isTurning = false;
+    const TOTAL = 10;
+    const gallery = document.getElementById('gallery');
+    const menu = document.getElementById('menu');
+    const photoList = document.getElementById('photoList');
 
-      // Precreate pages
-      const pages = [];
-      for(let i=0;i<TOTAL;i++){
-        const page = document.createElement('div');
-        page.className = 'page';
-        page.dataset.index = i;
+    for(let i=1;i<=TOTAL;i++){
+      const div=document.createElement('div');
+      div.className='photo-item';
+      const img=document.createElement('img');
+      img.src=`./images/photo${i}.jpg`;
+      img.alt=`Photo ${i}`;
+      div.appendChild(img);
+      photoList.appendChild(div);
+    }
 
-        const front = document.createElement('div');
-        front.className = 'front';
-        const fimg = document.createElement('img');
-        fimg.src = `./images/photo${i+1}.jpg`; // put your files here
-        fimg.alt = `Photo ${i+1}`;
-        front.appendChild(fimg);
+    document.getElementById('openGallery').addEventListener('click',()=>{
+      menu.classList.add('hidden');
+      gallery.classList.remove('hidden');
+    });
 
-        const back = document.createElement('div');
-        back.className = 'back';
-        const bimg = document.createElement('img');
-        // Use the next photo as the back face when flipping forward
-        bimg.src = `./images/photo${(i+1)%TOTAL + 1}.jpg`;
-        bimg.alt = `Photo ${(i+2)>TOTAL?1:(i+2)}`;
-        back.appendChild(bimg);
-
-        page.appendChild(front);
-        page.appendChild(back);
-
-        // position stacking: higher index on top
-        page.style.zIndex = TOTAL - i;
-
-        viewer.appendChild(page);
-        pages.push(page);
-
-        // dots
-        const dot = document.createElement('div');
-        dot.className='dot';
-        dot.dataset.i = i;
-        dot.addEventListener('click', ()=>goTo(i));
-        dots.appendChild(dot);
-      }
-
-      function updateUI(){
-        // show only current on top by adjusting visibility
-        pages.forEach((p,pi)=>{
-          if(pi < index) p.style.opacity = '0';
-          else p.style.opacity = '1';
-        });
-        // active dot
-        Array.from(dots.children).forEach((d,di)=> d.classList.toggle('active', di===index));
-        caption.textContent = `Photo ${index+1} / ${TOTAL}`;
-      }
-
-      function turnForward(){
-        if(isTurning || index >= TOTAL-1) return;
-        isTurning = true;
-        const p = pages[index];
-        p.classList.add('turning');
-        setTimeout(()=>{
-          // after animation: move this page to the back of the stack
-          p.classList.remove('turning');
-          // rotate DOM order so viewer always shows current index as 0
-          viewer.appendChild(p);
-          // update pages array order
-          pages.push(p);
-          pages.splice(index,1);
-          index = Math.min(index+1, TOTAL-1);
-          isTurning = false;
-          updateUI();
-        }, 950);
-      }
-
-      function turnBackward(){
-        if(isTurning || index<=0) return;
-        isTurning = true;
-        // flipping backward: take previous page from end
-        const prevPage = pages[index-1];
-        // insert before current top to visually flip back
-        prevPage.classList.add('turning');
-        // slight delay to trigger CSS; then finish
-        setTimeout(()=>{
-          prevPage.classList.remove('turning');
-          index = Math.max(index-1, 0);
-          isTurning = false;
-          updateUI();
-        }, 700);
-      }
-
-      function goTo(i){
-        if(i===index) return;
-        // naive approach: set index and refresh; skipping intermediate flip animations
-        index = Math.max(0, Math.min(TOTAL-1,i));
-        updateUI();
-      }
-
-      // controls
-      document.getElementById('next').addEventListener('click', ()=>{
-        if(index < TOTAL-1) {
-          // start flip animation by adding turning to current page
-          const p = pages[index];
-          p.classList.add('turning');
-          setTimeout(()=>{
-            // after animation complete
-            p.classList.remove('turning');
-            viewer.appendChild(p);
-            pages.push(p);
-            pages.splice(index,1);
-            index = Math.min(index+1,TOTAL-1);
-            updateUI();
-          },950);
-        }
-      });
-      document.getElementById('prev').addEventListener('click', ()=>{
-        if(index>0){
-          // quick goTo previous
-          index = index-1;
-          updateUI();
-        }
-      });
-
-      // keyboard
-      window.addEventListener('keydown', (e)=>{
-        if(gallery.classList.contains('hidden')) return;
-        if(e.key==='ArrowRight') document.getElementById('next').click();
-        if(e.key==='ArrowLeft') document.getElementById('prev').click();
-      });
-
-      // menu actions
-      document.getElementById('openGallery').addEventListener('click', ()=>{
-        menu.classList.add('hidden'); menu.setAttribute('aria-hidden','true');
-        gallery.classList.remove('hidden'); gallery.setAttribute('aria-hidden','false');
-        updateUI();
-      });
-      document.getElementById('backToMenu').addEventListener('click', ()=>{
-        gallery.classList.add('hidden'); gallery.setAttribute('aria-hidden','true');
-        menu.classList.remove('hidden'); menu.setAttribute('aria-hidden','false');
-      });
-
-      // initial UI
-      updateUI();
-
-      // basic touch swipe support
-      let touchStartX = 0;
-      viewer.addEventListener('touchstart', e=> touchStartX = e.changedTouches[0].clientX);
-      viewer.addEventListener('touchend', e=>{
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if(dx < -40) document.getElementById('next').click();
-        if(dx > 40) document.getElementById('prev').click();
-      });
-
-    })();
+    document.getElementById('backToMenu').addEventListener('click',()=>{
+      gallery.classList.add('hidden');
+      menu.classList.remove('hidden');
+    });
   </script>
 </body>
 </html>
